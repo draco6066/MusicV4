@@ -1,0 +1,90 @@
+-- إعداد الواجهة
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 300, 0, 200)
+frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- خلفية سوداء
+frame.Parent = screenGui
+
+-- إضافة شعار (DRACO) في الزاوية العليا اليسرى
+local label = Instance.new("TextLabel")
+label.Text = "DRACO"
+label.Font = Enum.Font.GothamBold
+label.TextSize = 36
+label.TextColor3 = Color3.fromRGB(255, 0, 0) -- اللون الأحمر
+label.BackgroundTransparency = 1
+label.Position = UDim2.new(0, 10, 0, 10)
+label.Parent = frame
+
+-- مكان وضع كود الأغنية
+local codeBox = Instance.new("TextBox")
+codeBox.Size = UDim2.new(0, 280, 0, 40)
+codeBox.Position = UDim2.new(0, 10, 0, 60)
+codeBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+codeBox.PlaceholderText = "أدخل كود الأغنية"
+codeBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+codeBox.Parent = frame
+
+-- زر تشغيل الأغنية
+local playButton = Instance.new("TextButton")
+playButton.Size = UDim2.new(0, 280, 0, 40)
+playButton.Position = UDim2.new(0, 10, 0, 110)
+playButton.Text = "تشغيل الأغنية"
+playButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- اللون الأحمر
+playButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+playButton.Font = Enum.Font.GothamBold
+playButton.Parent = frame
+
+-- زر إغلاق
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 40, 0, 40)
+closeButton.Position = UDim2.new(1, -50, 0, 10)
+closeButton.Text = "X"
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.GothamBold
+closeButton.Parent = frame
+
+-- وظيفة إغلاق الواجهة
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
+
+-- وظيفة تشغيل الأغنية
+playButton.MouseButton1Click:Connect(function()
+    local songCode = codeBox.Text
+    if songCode ~= "" then
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://" .. songCode
+        sound.Parent = player.Character or player:WaitForChild("Character")
+        sound:Play()
+    end
+end)
+
+-- تمكين تحريك الواجهة
+local dragging = false
+local dragInput, dragStart, startPos
+
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
